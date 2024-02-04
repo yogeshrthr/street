@@ -1,0 +1,18 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+# /public/img
+# /public/reel
+# /public/product/image
+# /public/product/gallery
+# /public/slide
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
