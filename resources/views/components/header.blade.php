@@ -4,6 +4,8 @@
 
 <!-- Mirrored from demo.bootstrapdash.com/libertyui/template/demo/vertical-default-light/pages/widgets/widgets.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 25 Sep 2023 12:38:15 GMT -->
 <head>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

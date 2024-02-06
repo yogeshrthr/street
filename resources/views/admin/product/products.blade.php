@@ -69,11 +69,11 @@
                 </div>
                 <div>
                 </div>
-                <div class="modal fade contentmodal show" id="AddModal" role="dialog" aria-labelledby="myModalLabel" style="padding-right: 17px; z-index: 10000;" aria-modal="true">
+            <div class="modal fade contentmodal show" id="AddModal" role="dialog" aria-labelledby="myModalLabel" style="padding-right: 17px; z-index: 10000;" aria-modal="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content doctor-profile">
                         <div class="modal-header">
-                                <h3 class="mb-0">Add New Product</h3>
+                                <h3 class="mb-0" id="add_edit_text"> Add New Product</h3>
                                 <a href=""><button type="button" class="close-btn" data-bs-dismiss="modal">
                                     <i class="fa fa-close"></i>
                                 </button></a>
@@ -81,9 +81,11 @@
                             <div class="modal-body">
                                 <div class="add-wrap">
                                     <div class="card-body">
-                                        <form class="forms-sample" method="post"
+                                        <form id="add_edit_form" class="forms-sample" method="post"
                                             action="{{ route('store-product') }}" enctype="multipart/form-data">
                                             @csrf
+                                            <input type="hidden" class="form-control" id="product_id" name="product_id"
+                                                    >
                                             <div class="form-group">
                                                 <label>Product Name</label>
                                                 <input type="text" class="form-control" id="product_name" name="name"
@@ -117,14 +119,14 @@
                                                 <div class="col">
                                                     <div class="form-group">
                                                         <label>Thumbnail Image</label>
-                                                        <input type="file" name="image" accept="image/*"
+                                                        <input id="thumbnail_img" type="file" name="image" accept="image/*"
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
                                                 <div class="col">
                                                     <div class="form-group">
                                                         <label>Gallery Image</label>
-                                                        <input type="file" name="gallery_image[]" accept="image/*"
+                                                        <input id="gallery_img" type="file" name="gallery_image[]" accept="image/*"
                                                             multiple class="form-control" required>
                                                     </div>
                                                 </div>
@@ -253,7 +255,14 @@
 
 <script>
     function AddNewModal() {
-        $('#AddModal').modal('show');
+        $('#AddModal').modal('show');        
+        $('#add_edit_form').removeAttr('action');
+        $('#add_edit_text').html('Add New Product')
+        $('#add_edit_form').attr('action', "{{ route('store-product') }}")
+        $('#product_id').val('')
+        $('#gallery_img').attr('required' ,'required');
+        $('#thumbnail_img').attr('required', 'required');
+
     }
 
     function DoEdit(id, title, banner) {
@@ -293,15 +302,23 @@
                 // Handle the success response, e.g., update the UI
                console.log(attributeObj);
                 if(response.status==200){
-                     $('#productPriceAndStock')
-                    
-                     $('#category_id').val(response.product.category.id).trigger('change');
-                     console.log(response.product.category.id,response.product.subcategory.id)
-                     $('#attributeNameList').after(response.variation);
-                     $('#subcategory_id').val(response.product.subcategory.id).trigger('change');
-                     $('#product_name').val(response.product.name)
-                     $('#product_desc').html(response.product.description)
-                     attributeObj=(response.json_obj)
+                     //$('#productPriceAndStock')
+                    $('#add_edit_text').html('Edit Product')
+                    $('#add_edit_form').removeAttr('action');
+                    $('#add_edit_form').attr('action', "{{url('admin/edit-products')}}");
+                    $('#gallery_img').removeAttr('required');
+                    $('#thumbnail_img').removeAttr('required');
+
+                    $('#product_id').val(response.product.id)
+                    $('#category_id').val(response.product.category.id).trigger('change');
+                    console.log(response.product.category.id,response.product.subcategory.id)
+                    $('#attributeNameList').html(response.variation);
+                    $('#subcategory_id').val(response.product.subcategory.id).trigger('change');
+                    $('#product_name').val(response.product.name)
+                    $('#product_desc').html(response.product.description)
+                    attributeObj=(response.json_obj)
+                    $('#productPriceAndStock').html(response.product_price)
+                     
                 }
                 
                 

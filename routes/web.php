@@ -75,12 +75,14 @@ Route::group(['middleware' => 'prevent-back-button'],function(){
     Route::get('/admin-products',[ProductController::class,'adminProducts'])->name('admin-products');
     Route::post('/append-product-sub-category',[ProductController::class,'appendProductSubCategory'])->name('append-product-sub-category');
     Route::post('/append-attribute-data',[ProductController::class,'appendAttributeData'])->name('append-attribute-data');
-    Route::post('/append-attribute-data1',[ProductController::class,'appendAttributeData1'])->name('append-attribute-data');
+    Route::post('/append-attribute-data1',[ProductController::class,'appendAttributeData1']);
     Route::post('/fetch-product-price',[ProductController::class,'fetchProductPrice'])->name('fetch-product-price');
-    Route::post('/fetch-product-price1',[ProductController::class,'fetchProductPrice1'])->name('fetch-product-price1');
+    //Route::post('/fetch-product-price1',[ProductController::class,'fetchProductPrice1'])->name('fetch-product-price1');
     Route::post('/store-product',[ProductController::class,'storeProduct'])->name('store-product');
     Route::post('Admin/changeProductStatus',[ProductController::class,'changeProductStatus'])->name('Admin/changeProductStatus');
     route::post('/get-produt-details', [ProductController::class,'get_product_details'])->name('Admin/get_product_details');
+    route::post('admin/remove-variations', [ProductController::class,'remove_product_variation'])->name('Admin/remove_product_variation');
+    route::post('admin/edit-products', [ProductController::class,'edit_products'])->name('Admin/edit_products');
 
     // Orders
     Route::get('/Admin/order-list',[AdminController::class,'order_list'])->name('Admin/order-list');

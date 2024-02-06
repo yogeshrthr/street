@@ -20,13 +20,14 @@ var attributeObj = {};
 function fetchProductAttribute() {
      var csrfToken = "{{ csrf_token() }}";
     $.ajax({
-        url: 'append-attribute-data1',
+        url: 'append-attribute-data',
         type: 'POST',
         data: {
             _token: csrfToken,
             attribute_array: JSON.stringify(attributeObj)
         },
         success: function(attributeNameResponse) {
+            $('#attributeNameList').html('');
             $('#attributeNameList').html(attributeNameResponse);
             $('#productAttribute').attr('required', false);
             $('#productAttribute').val('');
@@ -75,9 +76,14 @@ function appendAttribute() {
         }
     }
 }
-function deleteAttributeName(attribute) {
+function deleteAttributeName(attribute,flag='') {
     console.log(attributeObj,typeof attributeObj)
-  // return false
+
+    if(flag!=''){
+
+
+    }
+
     if (attribute in attributeObj) {
         delete attributeObj[attribute];
     }
@@ -93,7 +99,32 @@ function addAttributeValue(attribute, id) {
     $('#' + id + '').val('');
     fetchProductAttribute();
 }
-function removeAttributeValue(attribute_data, attribute, attribute_value) {
+function removeAttributeValue(attribute_data, attribute, attribute_value,flag='') {
+    if(flag!=''){
+        console.log(flag)
+        return false
+        // var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+        // $.ajax({
+        //     url: "{{url(admin/remove-variations)}}", // Replace with your actual backend endpoint
+        //     type: 'POST',
+        //     data: {
+        //         _token: csrfToken,
+        //         attribute_data: attributeData,
+        //         attribute: attribute,
+        //         attribute_value: attributeValue
+        //     },
+        //     success: function(response) {
+        //         // Handle success response here
+        //         console.log(response);
+        //     },
+        //     error: function(error) {
+        //         // Handle error here
+        //         console.log(error);
+        //     }
+        // });
+    }
+
     attribute_data = attribute_data.split("," + attribute_value + "").join("");
     attribute_data = attribute_data.split(attribute_value).join("");
     if (attribute_data.length == 0) {
