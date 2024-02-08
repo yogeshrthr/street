@@ -316,7 +316,7 @@
                     $('#subcategory_id').val(response.product.subcategory.id).trigger('change');
                     $('#product_name').val(response.product.name)
                     $('#product_desc').html(response.product.description)
-                    attributeObj=(response.json_obj)
+                    attributeObj = response.json_obj ?? {};
                     $('#productPriceAndStock').html(response.product_price)
                      
                 }

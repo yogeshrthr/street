@@ -52,6 +52,7 @@ function fetchProductPrice(id) {
         },
         success: function(productPriceResponse) {
             $('#productPriceAndStock').html(productPriceResponse);
+            fetchProductAttribute();
         },
         error: function(productPriceError) {
             console.log(productPriceError);
@@ -66,7 +67,13 @@ function enableProductStoreBtn() {
 }
 function appendAttribute() {
     if ($('#productAttribute').val().length > 0) {
+
         var attributeValue = $('#productAttribute').val();
+       
+        //return false
+        if(attributeObj=='')
+        attributeObj = {};
+        console.log(attributeValue,attributeObj)
         if (!(attributeValue in attributeObj)) {
             attributeObj[attributeValue] = {};
             //console.log(attributeObj);

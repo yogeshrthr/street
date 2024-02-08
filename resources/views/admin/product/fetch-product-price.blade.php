@@ -1,8 +1,14 @@
 @if ($product_variation == 'Single')
+<?php if (session()->has('product_variation')) {
+            $product_variation = session('product_variation');
+        } else {
+            $product_variation = []; 
+        } 
+?>
     <div class="col mb-0">
         <div class="form-group">
             <label>Product Type</label>
-            <select onchange="fetchProductPrice(this)" name="product_variation" class="form-control" required>
+            <select onchange="fetchProductPrice(this)" name="product_variation"   class="form-control" required>
                 <option value="Single" selected>Single</option>
                 <option value="Variable">Variable</option>
             </select>
@@ -11,23 +17,24 @@
     <div class="col mb-0">
         <div class="form-group">
             <label>Product Price</label>
-            <input type="number" class="form-control" name="price" placeholder="Product Price" required>
+            <input type="number" class="form-control" name="price" value="{{isset($product_variation['price'])?$product_variation['price']:''}}"  placeholder="Product Price" required>
         </div>
     </div>
     <div class="col mb-0">
         <div class="form-group">
             <label>Discount Price</label>
-            <input type="number" class="form-control" name="discount_price" placeholder="Discount Price" required>
+            <input type="number" class="form-control" name="discount_price"  value="{{isset($product_variation['discount'])?$product_variation['discount']:''}}" placeholder="Discount Price" required>
         </div>
     </div>
     <div class="col mb-0">
         <div class="form-group">
             <label>Product Stock</label>
-            <input type="number" class="form-control" name="stock" placeholder="Product Stock" required>
+            <input type="number" class="form-control" value="{{isset($product_variation['stock'])?$product_variation['stock']:''}}" name="stock" placeholder="Product Stock" required>
         </div>
     </div>
 @endif
 @if ($product_variation == 'Variable')
+
     <div class="col mb-0">
         <div class="form-group">
             <label>Product Variation</label>

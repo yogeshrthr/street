@@ -24,7 +24,7 @@
         $attribute_combination_array = [];
         $attribute_name_list = [];
         $attribute_value_list = [];
-        //dd($attribute_array,$exist_attr);
+       // dd($attribute_array,$exist_attr);
     @endphp
     @foreach ($attribute_array as $attribute_name => $attribute_value)
         <div class="row g-2" id="attributeListValue">
@@ -117,7 +117,8 @@
                 <label>Attributes</label>
                 <p><span class="badge bg-primary text-white">{{ implode(',', $result[$i]) }}</span></p>
                 <?php //dd(findVariation($stocks->toArray(), implode(',', $result[$i]))  );
-                    $product_data=findVariation($stocks->toArray(), implode(',', $result[$i])) ;
+                    $product_data=findVariation($stocks->toArray(), implode(',', $result[$i]));
+                    //dd($product_data,$stocks->toArray(), implode(',', $result[$i]));
                 ?>
             </div>
             <div class="col mb-0">
@@ -142,7 +143,7 @@
             <div class="col mb-0">
                 <div class="form-group">
                     <label>Variation Image</label>
-                    <input type="file" name="variation_img[<?php echo $i;?>]" accept="image/*" class="form-control" placeholder="" >
+                    <input type="file" name="variation_img[<?php echo $i;?>]" @if(isset($product_data) && !empty($product_data)) required @endif accept="image/*" class="form-control" placeholder="" >
                 </div>
             </div>
         </div>
