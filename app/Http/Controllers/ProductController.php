@@ -50,10 +50,8 @@ class ProductController extends Controller
                         ]
                     );
                 }
-            }
-           
-            // $product->save();
-
+            }           
+            $product->save();
             // checking here while edit added any new variation or not
             if($request->product_variation=='Variable'){
                 
@@ -76,7 +74,7 @@ class ProductController extends Controller
                     $variation=explode(',',$request->variant_name_list[0]); 
                     $variant_value_list=explode('|',$request->variant_value_list[0]);
                     // dd();
-                    // dd( $variation,$request->all(), $variant_value_list[0])            ;
+                    // dd( $variation,$request->all(), $variation[0])            ;
                     $existingVariationTypes = Variation::where('product_id', $product->id)->pluck('variation_type')->toArray();
                     foreach ($variation as $key => $variantValue) {
                         $variationType = $variant_value_list[$key];                    
@@ -85,7 +83,7 @@ class ProductController extends Controller
                             ['variation_list' => $variationType]
                         );
                         // Remove the processed variation type from the list of existing variation types
-                        $index = array_search($variationType, $existingVariationTypes);
+                        $index = array_search($variantValue, $existingVariationTypes);
                         if ($index !== false) {
                             unset($existingVariationTypes[$index]);
                         }
@@ -96,19 +94,21 @@ class ProductController extends Controller
                         ->delete();
                 }
                 // update stocks value
+                // dd($request->variation);
                 $createdOrUpdatedStockIds= [];
                 foreach($request->variation as $key=>$variation){
-                    $stocks = Stock::where('product_id', $product->id)
-                    ->where('variation_type', 'Variable')
-                    ->where(function ($query) use ($variation) {
-                        // Check for the original variation
-                        $query->where('variation', 'LIKE', '%' . $variation . '%');
+                    $sortedVariation = implode(',', array_values(explode(',', $variation)));
+                    $sortedVariationArray = explode(',', $sortedVariation);
+                    sort($sortedVariationArray);
+                    $sortedVariation = implode(',', $sortedVariationArray);
 
-                        // Check for the reversed variation
-                        $reversedVariation = implode(',', array_reverse(explode(',', $variation)));
-                        $query->orWhere('variation', 'LIKE', '%' . $reversedVariation . '%');
-                    })
-                    ->firstOrNew();
+                    $stocks = Stock::where('product_id', $product->id)
+                        ->where('variation_type', 'Variable')
+                        ->where(function ($query) use ($sortedVariation) {
+                            // Sort the elements in the database variation before comparing
+                            $query->whereRaw('FIND_IN_SET(?, variation)', [$sortedVariation]);
+                        })
+                        ->firstOrNew();
 
                     // If the record was not found, set the variation column and other attributes
                     if (!$stocks->exists) {
@@ -199,33 +199,30 @@ class ProductController extends Controller
             }
 
             
-            dd($request->all());
+            // dd($request->all());
             
-        //         return redirect()->back()
-        //         ->with('success','Product Added');
-        //     }else {
-        //         return redirect()->back()
-        //         ->with('error','Product Already Exists');
-        //     }
-        // }else {
-        //     return redirect()->route('Admin')->with('error','Login please.');
+            return redirect()->back()
+            ->with('Success','Product Update Successfully');
+            
+        }else {
+            return redirect()->route('Admin')->with('error','Login please.');
         }
     }    
     
     public function get_product_details(Request $request){
 
-        $product=Product::with(['category','variations','all_stocks','subcategory'])->find(15);
+        $product=Product::with(['category','variations','all_stocks','subcategory'])->findorfail($request->product_id);
         // Initialize an empty array to store the transformed data
         // dd($product->toArray());        
         if($product->all_stocks[0]->variation_type=='Variable'){
             $temp['id']=$product->id;
-            if(session()->has('product_variable_variation') && session('product_variable_variation')['id']==$temp['id']){                
+            // if(session()->has('product_variable_variation') && session('product_variable_variation')['id']==$temp['id']){                
                 
-                $outputData=session('product_variable_variation')['outputData'];
-                $attribute_array=session('product_variable_variation')['outputData'];
-                $stocks=session('product_variable_variation')['all_stocks'];
-                $exist_attr=$attribute_array;
-            }else{
+                // $outputData=session('product_variable_variation')['outputData'];
+                // $attribute_array=session('product_variable_variation')['outputData'];
+                // $stocks=session('product_variable_variation')['all_stocks'];
+                // $exist_attr=$attribute_array;
+            // }else{
                 
                 $outputData = [];
                 foreach ($product['variations'] as $item) {
@@ -245,7 +242,7 @@ class ProductController extends Controller
                 $stocks=$product['all_stocks'];
                 $exist_attr=$attribute_array;
                 session(['product_variable_variation' => $temp]);
-            }
+            // }
             // dd(session('product_variable_variation'));
             // session(['product_variable_variation' => $variation_value]);
             session()->forget('product_variation');            
@@ -342,44 +339,58 @@ class ProductController extends Controller
         // $attribute_array = json_decode($request->attribute_array,true);
         // dd(json_decode($request->attribute_array,true));
         // return view('admin.product.append-attribute-list',compact(['attribute_array']))->render();
-        $result = [];   
-        $product=Product::with(['category','variations','all_stocks','subcategory'])->find(15);
+        $result = [];           
         // Initialize an empty array to store the transformed data
-        if(count($product->variations) && count(json_decode($request->attribute_array,true))){
-            // dd('fdsadf');
-            $outputData = [];            
-            foreach ($product['variations'] as $item) {
-                $variationType = $item['variation_type'];
-                // $variationList = explode(',', $item['variation_list']);
-            
-                // Create a new array for each variation type
-                $outputData[$variationType] = $item['variation_list'];
-            }
-            $attribute_array = json_decode($request->attribute_array,true);
-            // dd(array_keys($outputData + $attribute_array) );
-            foreach (array_keys($outputData + $attribute_array) as $key) {
-                if((isset($attribute_array[$key]) && !empty($attribute_array[$key])) &&  (isset($outputData[$key]) && !empty(($outputData[$key])) )){
-                    $value1 = isset($outputData[$key]) ? trim($outputData[$key], ',') : '';
-                    $value2 = isset($attribute_array[$key]) ? trim($attribute_array[$key], ',') : '';        
-                    $result[$key] = implode(',', array_unique(array_merge(explode(',', $value1), explode(',', $value2))));            
-                    // Remove both leading and trailing commas
-                    $result[$key] = trim($result[$key], ',');
+        if(  count(json_decode($request->attribute_array,true))){            
+                $product=Product::with(['category','variations','all_stocks','subcategory'])->find(15);
+            // if(count($product->variations)){
+                $temp['id']=$product->id;
+                if(session()->has('product_variable_variation') && session('product_variable_variation')['id']==$temp['id']){                
+                    
+                    $outputData=session('product_variable_variation')['outputData'];
+                    $attribute_array = json_decode($request->attribute_array,true);
+                    $stocks=session('product_variable_variation')['all_stocks'];
+                    // dd($outputData,$attribute_array,$stocks->toArray());
+                    
                 }else{
-                    $result[$key]=$attribute_array[$key];
-                }
+                    $outputData = [];            
+                    foreach ($product['variations'] as $item) {
+                        $variationType = $item['variation_type'];
+                        // $variationList = explode(',', $item['variation_list']);
+                    
+                        // Create a new array for each variation type
+                        $outputData[$variationType] = $item['variation_list'];
+                    }
+                    $attribute_array = json_decode($request->attribute_array,true);
                 
+                    $stocks=$product['all_stocks']; 
+                }            
+                // dd((session()->has('product_variable_variation')),session('product_variable_variation'),array_keys($outputData + $attribute_array) );
+                foreach (array_keys($outputData + $attribute_array) as $key) {
+                    if((isset($attribute_array[$key]) && !empty($attribute_array[$key])) &&  (isset($outputData[$key]) && !empty(($outputData[$key])) )){
+                        $value1 = isset($outputData[$key]) ? trim($outputData[$key], ',') : '';
+                        $value2 = isset($attribute_array[$key]) ? trim($attribute_array[$key], ',') : '';        
+                        $result[$key] = implode(',', array_unique(array_merge(explode(',', $value1), explode(',', $value2))));            
+                        // Remove both leading and trailing commas
+                        $result[$key] = trim($result[$key], ',');
+                    }else{
+                        $result[$key]=$attribute_array[$key];
+                    }
+                    
+                }
+                // dd($outputData,$attribute_array,$result );
+                $exist_attr=$outputData;
+                $attribute_array=$result;   
+                //    dd($attribute_array,$stocks->toArray(),$exist_attr);
+                return view('admin.product.test1',compact(['attribute_array','stocks','exist_attr']))->render();
+       
+                // }
             }
-            // dd($outputData,$attribute_array,$result );
-            $exist_attr=$outputData;
-            $attribute_array=$result;
-            $stocks=$product['all_stocks'];       
-            return view('admin.product.test1',compact(['attribute_array','stocks','exist_attr']))->render();
-        }else{
             
-            $attribute_array = json_decode($request->attribute_array,true);
-            // dd($attribute_array);
-            return view('admin.product.append-attribute-list',compact(['attribute_array']))->render();
-        }
+        $attribute_array = json_decode($request->attribute_array,true);
+        // dd($attribute_array);
+        return view('admin.product.append-attribute-list',compact(['attribute_array']))->render();
+        
         
 
 
@@ -388,9 +399,6 @@ class ProductController extends Controller
 
 
 
-        // $attribute_array = json_decode($request->attribute_array,true);
-        // // dd($attribute_array);
-        // return view('admin.product.append-attribute-list',compact(['attribute_array']))->render();
     }
     // public function appendAttributeData1(Request $request) {
     //     $product=Product::with(['category','variations','all_stocks','subcategory'])->find(13);
@@ -546,7 +554,31 @@ class ProductController extends Controller
         return redirect()->route('admin-products')->with('success','Status change successfully.');
     }  
     public function remove_product_variation(Request $request) {
-        dd($request->all());
+        if (session()->has('product_variable_variation') && session('product_variable_variation')) {
+            $temp = session('product_variable_variation')['outputData'];        
+            // Check if the "attribute_data" key exists and is not empty
+            if (isset($temp[$request->attribute]) && !empty($temp[$request->attribute]) && $request->flag==0) {
+                // Remove the attribute_value and surrounding commas from attribute_data
+                $pattern = '/\b' . preg_quote($request->attribute_value, '/') . '\b,?|,?\b' . preg_quote($request->attribute_value, '/') . '\b/';
+                $attributeData = preg_replace($pattern, '', $temp[$request->attribute]);
+        
+                // Update the array with the modified attribute_data
+                $temp[$request->attribute] = $attributeData;
+        
+                // Update the session variable
+                session(['product_variable_variation.outputData' => $temp]);
+
+            }else if(isset($temp[$request->attribute]) && !empty($temp[$request->attribute])){
+                unset($temp[$request->attribute]);
+                session(['product_variable_variation.outputData' => $temp]);
+            }
+            // dd(empty($temp[$request->attribute]),session('product_variable_variation'));
+            return response()->json(['status'=>200,'msg'=>'success']);       
+            
+        } else {
+            return response()->json(['status'=>400,'msg'=>'Something Went Wrong']);
+        }
+        
     }
     
     

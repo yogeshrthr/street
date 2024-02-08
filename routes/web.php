@@ -81,7 +81,7 @@ Route::group(['middleware' => 'prevent-back-button'],function(){
     Route::post('/store-product',[ProductController::class,'storeProduct'])->name('store-product');
     Route::post('Admin/changeProductStatus',[ProductController::class,'changeProductStatus'])->name('Admin/changeProductStatus');
     route::post('/get-produt-details', [ProductController::class,'get_product_details'])->name('Admin/get_product_details');
-    route::post('admin/remove-variations', [ProductController::class,'remove_product_variation'])->name('Admin/remove_product_variation');
+    route::post('/admin/remove-variations', [ProductController::class,'remove_product_variation'])->name('Admin/remove_product_variation');
     route::post('admin/edit-products', [ProductController::class,'edit_products'])->name('Admin/edit_products');
 
     // Orders

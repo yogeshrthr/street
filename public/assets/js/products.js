@@ -17,14 +17,15 @@ function appendSubcategories(el) {
 }
 var attributeObj = {};
 
-function fetchProductAttribute() {
+function fetchProductAttribute(product_id='') {
      var csrfToken = "{{ csrf_token() }}";
     $.ajax({
         url: 'append-attribute-data',
         type: 'POST',
         data: {
             _token: csrfToken,
-            attribute_array: JSON.stringify(attributeObj)
+            attribute_array: JSON.stringify(attributeObj),
+            product_id:product_id,
         },
         success: function(attributeNameResponse) {
             $('#attributeNameList').html('');
@@ -87,16 +88,42 @@ function deleteAttributeName(attribute,flag='') {
     console.log(attributeObj,typeof attributeObj)
 
     if(flag!=''){
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+        $.ajax({
+            url: "admin/remove-variations", // Replace with your actual backend endpoint
+            type: 'POST',
+            data: {
+                _token: csrfToken,
+                attribute: attribute,
+                flag:1,  //0 for attribute value 1- for delete attribute name
+            },
+            success: function(response) {
+                // Handle success response here
+                if(response.status==200){
+                    if (attribute in attributeObj) {
+                        delete attributeObj[attribute];
+                    }
+                    fetchProductAttribute();
+                }else{
 
+                }
+            },
+            error: function(error) {
+                // Handle error here
+                console.log(error);
+            }
+        });
+
+    }else{
+        if (attribute in attributeObj) {
+            delete attributeObj[attribute];
+        }
+        fetchProductAttribute();
     }
-
-    if (attribute in attributeObj) {
-        delete attributeObj[attribute];
-    }
-    fetchProductAttribute();
+    
 }
-function addAttributeValue(attribute, id) {
+function addAttributeValue(attribute, id,product_id='') {
     var attributeValueData = $('#' + id + '').val();
     if (JSON.stringify(attributeObj[attribute]) === '{}') {
         attributeObj[attribute] = attributeValueData;
@@ -104,40 +131,53 @@ function addAttributeValue(attribute, id) {
         attributeObj[attribute] = attributeObj[attribute] + ',' + attributeValueData;
     }
     $('#' + id + '').val('');
-    fetchProductAttribute();
+    fetchProductAttribute(product_id);
 }
 function removeAttributeValue(attribute_data, attribute, attribute_value,flag='') {
     if(flag!=''){
         console.log(flag)
-        return false
-        // var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        // return false
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-        // $.ajax({
-        //     url: "{{url(admin/remove-variations)}}", // Replace with your actual backend endpoint
-        //     type: 'POST',
-        //     data: {
-        //         _token: csrfToken,
-        //         attribute_data: attributeData,
-        //         attribute: attribute,
-        //         attribute_value: attributeValue
-        //     },
-        //     success: function(response) {
-        //         // Handle success response here
-        //         console.log(response);
-        //     },
-        //     error: function(error) {
-        //         // Handle error here
-        //         console.log(error);
-        //     }
-        // });
+        $.ajax({
+            url: "admin/remove-variations", // Replace with your actual backend endpoint
+            type: 'POST',
+            data: {
+                _token: csrfToken,
+                attribute_data: attribute_data,
+                attribute: attribute,
+                flag:0,  //0 for attribute value 1- for delete attribute name
+            },
+            success: function(response) {
+                // Handle success response here
+                if(response.status==200){
+                    attribute_data = attribute_data.split("," + attribute_value + "").join("");
+                    attribute_data = attribute_data.split(attribute_value).join("");
+                    if (attribute_data.length == 0) {
+                        attributeObj[attribute] = {};
+                    } else {
+                        attributeObj[attribute] = attribute_data;
+                    }
+                    fetchProductAttribute();
+                }else{
+
+                }
+            },
+            error: function(error) {
+                // Handle error here
+                console.log(error);
+            }
+        });
+    }else{
+        attribute_data = attribute_data.split("," + attribute_value + "").join("");
+        attribute_data = attribute_data.split(attribute_value).join("");
+        if (attribute_data.length == 0) {
+            attributeObj[attribute] = {};
+        } else {
+            attributeObj[attribute] = attribute_data;
+        }
+        fetchProductAttribute();
     }
 
-    attribute_data = attribute_data.split("," + attribute_value + "").join("");
-    attribute_data = attribute_data.split(attribute_value).join("");
-    if (attribute_data.length == 0) {
-        attributeObj[attribute] = {};
-    } else {
-        attributeObj[attribute] = attribute_data;
-    }
-    fetchProductAttribute();
+    
 }

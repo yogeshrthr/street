@@ -36,9 +36,13 @@
                 </div>
             </div>
             <div class="col-md-7 mb-0">
-                <input onclick="addAttributeValue('{{ $attribute_name }}','attribute{{ $attribute_name }}Value')"
-                    value="Add Attribute Value" type="button" class="btn btn-primary mt-4" name="add_product_attribute"
-                    required />
+                <input  onclick="addAttributeValue('{{ $attribute_name }}', 'attribute{{ $attribute_name }}Value'{{ isset($stocks[0]->product_id) ? ', ' . $stocks[0]->product_id : '' }})"
+                    value="Add Attribute Value" 
+                    type="button" 
+                    class="btn btn-primary mt-4" 
+                    name="add_product_attribute" 
+                    required 
+                />
                     @if (array_key_exists($attribute_name, $exist_attr))
                         <button type="button" onclick="deleteAttributeName('{{ $attribute_name }}','old')"
                             class="btn btn-sm btn-danger mt-4"><i class="fa fa-trash me-sm-1"></i></button>
@@ -143,7 +147,7 @@
             <div class="col mb-0">
                 <div class="form-group">
                     <label>Variation Image</label>
-                    <input type="file" name="variation_img[<?php echo $i;?>]" @if(isset($product_data) && !empty($product_data)) required @endif accept="image/*" class="form-control" placeholder="" >
+                    <input type="file" name="variation_img[<?php echo $i;?>]" @if(isset($product_data) && empty($product_data)) required @endif accept="image/*" class="form-control" placeholder="" >
                 </div>
             </div>
         </div>
