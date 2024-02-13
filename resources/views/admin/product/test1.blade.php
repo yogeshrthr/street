@@ -147,8 +147,11 @@
             <div class="col mb-0">
                 <div class="form-group">
                     <label>Variation Image</label>
-                    <input type="file" name="variation_img[<?php echo $i;?>]" @if(isset($product_data) && empty($product_data)) required @endif accept="image/*" class="form-control" placeholder="" >
+                    <input type="file" name="variation_img[<?php echo $i;?>]" @if(isset($product_data) && empty($product_data['variation_img'])) required @endif    @if(isset($product_data) && empty($product_data)) required @endif accept="image/*" class="form-control" placeholder="" >
                 </div>
+            </div>
+            <div classs="col"><br>
+            @if(isset($product_data) && !empty($product_data['variation_img'])) <a href="{{url($product_data['variation_img'])}}" target="_blank"> View Image</a>@endif
             </div>
         </div>
     @endfor

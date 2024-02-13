@@ -197,12 +197,9 @@ class ProductController extends Controller
                     ]
                 );
             }
-
-            
-            // dd($request->all());
             
             return redirect()->back()
-            ->with('Success','Product Update Successfully');
+            ->with('success','Product Update Successfully');
             
         }else {
             return redirect()->route('Admin')->with('error','Login please.');

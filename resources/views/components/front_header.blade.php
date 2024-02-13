@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+@props(['metaTags' => []])
 
 <head>
     <meta charset="UTF-8" />
@@ -17,6 +18,9 @@
     <link rel="stylesheet" href="css/easyzoom.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/10.2.0/swiper-bundle.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+        @foreach ($metaTags as $item)
+            {!! $item !!}
+        @endforeach
 
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
