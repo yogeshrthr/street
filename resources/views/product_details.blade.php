@@ -30,12 +30,12 @@ $tag = [
             border-color: #198754;
             border-width: 2px;
         }
-        .thumbnails-li{
+        /* .thumbnails-li{
             cursor:pointer;
         }
         .thumbnails-li.active {
             border: 2px solid green;
-        }
+        } */
     </style>
     <div class="container p-3" style="max-width: 1473px !important;">
         <?php $cate=DB::table('categories')->where('id',$product->category_id)->orderBy('id','ASC')->first();
@@ -49,27 +49,27 @@ $tag = [
         </nav>
 
         <div class="row">
-            <div class="col-md-7" id="image-1">
+            <div style="width:500px;" class="col-md-7 content-center" id="image-1">
                 <!-- product gallery start -->
                 <div class="product-gallery-wrap">
-                    <div class="easyzoom easyzoom--overlay easyzoom--with-thumbnails">
+                    <div  class="easyzoom easyzoom--overlay easyzoom--with-thumbnails">
                         <a id="galleryImageLink" href="{{$product->image}}">
-                            <img id="galleryImage" src="{{$product->image}}" alt="" />
+                            <img  style="width:100%;" id="galleryImage" src="{{$product->image}}" alt="" />
                         </a>
                     </div>
 
                     <ul class="thumbnails" >
                         <li class="thumbnails-li" data-standard="{{$product->image}}">
-                            {{--<a href="{{$product->image}}" data-standard="{{$product->image}}">--}}
+                            <a href="{{$product->image}}" data-standard="{{$product->image}}">
                                 <img  src="{{$product->image}}" alt="" />
-                           {{-- </a>--}}
+                           </a>
                         </li>
                          <?php $images=DB::table('galleries')->where('product_id',$product->id)->orderBy('id','ASC')->get();
                          foreach($images as $img){?>
                         <li class="thumbnails-li" data-standard="{{$img->image}}">
-                            {{-- <a href="{{$img->image}}" data-standard="{{$img->image}}">--}}
+                             <a href="{{$img->image}}" data-standard="{{$img->image}}">
                                 <img src="{{$img->image}}" alt="" />
-                            {{-- </a>--}}
+                            </a>
                         </li>
                         <?php }?>
                         
@@ -476,7 +476,7 @@ $tag = [
      <x-front_footer />  
 
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-        <script src="dist/easyzoom.js"></script>
+        <!-- <script src="dist/easyzoom.js"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/10.2.0/swiper-bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script>
@@ -579,38 +579,6 @@ $tag = [
                     }
                 });
             }
-            
-
-
-            // Instantiate EasyZoom instances
-            var $easyzoom = $('.easyzoom').easyZoom();
-
-            // Setup thumbnails example
-            var api1 = $easyzoom.filter('.easyzoom--with-thumbnails').data('easyZoom');
-
-            $('.thumbnails').on('click', 'a', function (e) {
-                var $this = $(this);
-
-                e.preventDefault();
-
-                // Use EasyZoom's `swap` method
-                api1.swap($this.data('standard'), $this.attr('href'));
-            });
-
-            // Setup toggles example
-            var api2 = $easyzoom.filter('.easyzoom--with-toggle').data('easyZoom');
-
-            $('.toggle').on('click', function () {
-                var $this = $(this);
-
-                if ($this.data("active") === true) {
-                    $this.text("Switch on").data("active", false);
-                    api2.teardown();
-                } else {
-                    $this.text("Switch off").data("active", true);
-                    api2._init();
-                }
-            });
         </script>
         <script>
             /*Initialize Swiper*/
@@ -649,24 +617,52 @@ $tag = [
         </script>
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"
             integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-        <script src="index.js"></script>
+        <!-- <script src="index.js"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
             crossorigin="anonymous"></script>
         <script type="text/javascript" src="main.js"></script>
         <script>
             function AddToCart(price,product_id,stock_id,qty){
-                //console.log(price,product_id);
-                //return false;
                $.post("{{route('AddtoCart')}}",{quentity:qty,stock_id:stock_id,product_id:product_id,price:price,'_token':'{{csrf_token()}}'},function(result){
-      
-                 window.location.reload();
-    });
+                window.location.reload();
+                });
             }
-            
-            
-            
-        </script>
+        </script>    
+
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="{{asset('assets/dist/easyzoom.js')}}"></script>
+	<script>
+		// Instantiate EasyZoom instances
+		var $easyzoom = $('.easyzoom').easyZoom();
+
+		// Setup thumbnails example
+		var api1 = $easyzoom.filter('.easyzoom--with-thumbnails').data('easyZoom');
+
+		$('.thumbnails').on('click', 'a', function(e) {
+			var $this = $(this);
+
+			e.preventDefault();
+
+			// Use EasyZoom's `swap` method
+			api1.swap($this.data('standard'), $this.attr('href'));
+		});
+
+		// Setup toggles example
+		var api2 = $easyzoom.filter('.easyzoom--with-toggle').data('easyZoom');
+
+		$('.toggle').on('click', function() {
+			var $this = $(this);
+
+			if ($this.data("active") === true) {
+				$this.text("Switch on").data("active", false);
+				api2.teardown();
+			} else {
+				$this.text("Switch off").data("active", true);
+				api2._init();
+			}
+		});
+	</script>
 </body>
 
 </html>

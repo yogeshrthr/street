@@ -942,15 +942,15 @@ button{
   width: 24%;
   margin: 0px 1px !important;
 }
-.easyzoom {
+/* .easyzoom {
   padding: 5px 30px;
   width: 100%;
-}
-.easyzoom img {
+} */
+/* .easyzoom img {
   width: 100%;
-  height: 600px;
+  height: 300px;
   object-fit: cover;
-}
+} */
 @keyframes fade{
    0%{
        opacity: 0;
